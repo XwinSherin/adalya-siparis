@@ -382,6 +382,31 @@
                 getRowKg(id) { return this.getRowKoli(id) * 6; },
                 getProductName(p, l = this.lang) { return l === 'tr' ? p.tr : (l === 'ar' ? p.ar : p.en); },
 
+                // <<< EKLENEN/DÜZELTİLEN KOD BAŞLANGICI >>>
+                get filteredProducts() {
+                    if (this.search.length < 2) {
+                        // Arama terimi yoksa veya çok kısaysa, tüm ürünleri göster
+                        return this.products; 
+                    }
+                    
+                    const searchTerm = this.search.toLowerCase();
+                    
+                    return this.products.filter(p => {
+                        // Ürün adı veya kodu üzerinden arama yap
+                        // İlgili dil ismini kontrol et (TR, EN, AR)
+                        const trName = (p.tr || '').toLowerCase();
+                        const enName = (p.en || '').toLowerCase();
+                        const arName = (p.ar || '').toLowerCase();
+                        const code = (p.code || '').toLowerCase();
+                        
+                        return trName.includes(searchTerm) 
+                            || enName.includes(searchTerm)
+                            || arName.includes(searchTerm)
+                            || code.includes(searchTerm);
+                    });
+                },
+                // <<< EKLENEN/DÜZELTİLEN KOD BİTİŞİ >>>
+
                 get grandTotalKoli() { return Object.keys(this.cart).reduce((acc, id) => acc + this.getRowKoli(id), 0); },
                 get grandTotalKg() { return this.grandTotalKoli * 6; },
                 get totalItemsCount() { return Object.keys(this.cart).filter(id => this.getRowKoli(id) > 0).length; },
