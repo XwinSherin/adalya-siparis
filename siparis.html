@@ -3,9 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Adalya Pro V3</title>
+    <title>Adalya Gold Panel</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            50: '#fbf8eb',
+                            100: '#f5eccd',
+                            400: '#e2c044',
+                            500: '#d4af37', // Adalya Gold
+                            600: '#b38b22',
+                            700: '#8f6818',
+                            900: '#4d3608',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -15,36 +34,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; padding-bottom: 180px; }
-        /* Input oklarını gizle */
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; padding-bottom: 180px; }
         [x-cloak] { display: none !important; }
         
-        /* Sayıların sabit genişlikte görünmesi için */
-        .tabular-nums { font-variant-numeric: tabular-nums; }
+        /* Modal Tablo Stilleri */
+        .summary-table th, .summary-table td { border: 1px solid #e5e7eb; }
         
-        /* Modal Scroll */
+        /* Scrollbar */
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
     </style>
 </head>
-<body x-data="app()" x-init="init()" :dir="lang === 'ar' ? 'rtl' : 'ltr'" class="text-gray-800 transition-all duration-300">
+<body x-data="app()" x-init="init()" :dir="lang === 'ar' ? 'rtl' : 'ltr'" class="text-gray-800 selection:bg-gold-200">
 
-    <div class="fixed top-0 left-0 w-full bg-white/95 backdrop-blur shadow-sm z-40 px-4 py-3 border-b border-gray-200">
-        <div class="flex justify-between items-center max-w-3xl mx-auto">
-            <div class="flex items-center gap-3">
-                <img src="images/adalyalogo.jpg" class="w-10 h-10 rounded-lg shadow-sm object-cover border border-gray-100" onerror="this.style.display='none'">
-                <div>
-                    <h1 class="font-black text-lg tracking-tight text-gray-900">ADALYA</h1>
-                    <p class="text-[10px] font-semibold text-blue-600 uppercase tracking-wide" x-text="t('subtitle')"></p>
-                </div>
-            </div>
-            <div class="flex bg-gray-100 p-1 rounded-lg border border-gray-200" dir="ltr">
+    <button @click="window.scrollTo({top: 0, behavior: 'smooth'})" x-show="showScrollBtn" x-transition 
+        class="fixed bottom-24 right-4 z-30 bg-gray-800 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center opacity-80 hover:opacity-100">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <div class="fixed top-0 left-0 w-full bg-white/95 backdrop-blur shadow-md z-40 px-4 py-2 border-b border-gold-100">
+        <div class="flex flex-col items-center justify-center relative max-w-3xl mx-auto">
+            
+            <img src="images/adalyalogo.jpg" class="h-12 object-contain mb-1 transition-transform hover:scale-105" onerror="this.style.display='none'">
+            
+            <div class="absolute top-1/2 -translate-y-1/2 flex bg-gray-100 p-1 rounded-lg border border-gray-200" :class="lang==='ar' ? 'left-0' : 'right-0'">
                 <template x-for="l in ['tr', 'ar', 'en']">
-                    <button @click="lang = l" 
-                        :class="lang === l ? 'bg-white text-blue-600 shadow-sm font-bold' : 'text-gray-400 font-medium hover:text-gray-600'"
-                        class="w-8 h-7 flex items-center justify-center rounded-md text-xs uppercase transition-all" x-text="l"></button>
+                    <button @click="changeLang(l)" 
+                        :class="lang === l ? 'bg-gold-500 text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                        class="w-8 h-7 flex items-center justify-center rounded text-xs font-bold uppercase transition-all" x-text="l"></button>
                 </template>
             </div>
         </div>
@@ -52,24 +70,24 @@
 
     <div class="mt-24 px-4 max-w-3xl mx-auto">
         
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 mb-5">
+        <div class="bg-white p-5 rounded-xl shadow-sm border-t-4 border-gold-500 mb-5 ring-1 ring-gray-100">
             <div class="mb-4">
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-1.5" x-text="t('noteLabel')"></label>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5" x-text="t('noteLabel')"></label>
                 <div class="relative">
-                    <i class="fa-solid fa-pen absolute top-1/2 -translate-y-1/2 text-gray-400 text-sm" :class="lang === 'ar' ? 'right-3' : 'left-3'"></i>
+                    <i class="fa-solid fa-pen absolute top-1/2 -translate-y-1/2 text-gold-500 text-sm" :class="lang === 'ar' ? 'right-3' : 'left-3'"></i>
                     <input type="text" x-model="orderNote" :placeholder="t('notePlaceholder')" 
-                        class="w-full py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all"
+                        class="w-full py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold-400 focus:bg-white outline-none transition-all"
                         :class="lang === 'ar' ? 'pr-9 pl-4' : 'pl-9 pr-4'">
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-2" x-text="t('deliveryLabel')"></label>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2" x-text="t('deliveryLabel')"></label>
                 <div class="grid grid-cols-3 gap-3">
                     <template x-for="method in ['road', 'sea', 'air']">
                         <button @click="deliveryMethod=method" 
-                            :class="deliveryMethod==method ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'"
-                            class="py-2.5 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-1.5">
+                            :class="deliveryMethod==method ? 'bg-gold-500 text-white shadow-md shadow-gold-200' : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'"
+                            class="py-2.5 rounded-lg text-xs font-bold transition-all flex flex-col items-center gap-1.5">
                             <i :class="getDeliveryIconClass(method)"></i> 
                             <span x-text="t(method)"></span>
                         </button>
@@ -79,9 +97,9 @@
         </div>
 
         <div class="relative mb-6">
-            <i class="fa-solid fa-magnifying-glass absolute top-1/2 -translate-y-1/2 text-gray-400 text-lg" :class="lang === 'ar' ? 'right-4' : 'left-4'"></i>
+            <i class="fa-solid fa-magnifying-glass absolute top-1/2 -translate-y-1/2 text-gold-500 text-lg" :class="lang === 'ar' ? 'right-4' : 'left-4'"></i>
             <input x-model="search" type="text" :placeholder="t('search')" 
-                class="w-full py-4 bg-white rounded-2xl shadow-sm border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-700 font-medium placeholder-gray-400"
+                class="w-full py-4 bg-white rounded-xl shadow-sm border border-gray-200 focus:ring-2 focus:ring-gold-400 outline-none transition-all text-gray-700 font-medium placeholder-gray-400"
                 :class="lang === 'ar' ? 'pr-12 pl-4' : 'pl-12 pr-4'">
             
             <button x-show="search.length > 0" @click="search=''" class="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-red-500 hover:text-white transition-colors" :class="lang === 'ar' ? 'left-4' : 'right-4'">
@@ -91,49 +109,53 @@
 
         <div class="space-y-4">
             <template x-for="product in filteredProducts" :key="product.id">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
                     <div class="p-4 flex gap-4">
-                        <div class="w-24 h-24 shrink-0 bg-white rounded-xl border border-gray-100 p-1 flex items-center justify-center">
-                            <img :src="product.img" class="w-full h-full object-contain" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=Resim+Yok'">
+                        <div class="w-24 h-24 shrink-0 bg-white rounded-lg border border-gray-100 p-1 flex items-center justify-center">
+                            <img :src="product.img" class="w-full h-full object-contain" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=Adalya'">
                         </div>
                         
                         <div class="flex-1 min-w-0 flex flex-col justify-center">
                             <h3 class="font-bold text-gray-800 text-base leading-snug mb-1" x-text="getProductName(product)"></h3>
-                            </div>
+                            <p class="text-xs text-gray-400" x-text="product.code || ''"></p>
+                        </div>
                     </div>
 
                     <div class="px-4 pb-2">
                         <div class="grid grid-cols-3 gap-3">
                             <div class="space-y-1">
                                 <label class="block text-[10px] font-bold text-gray-400 text-center uppercase" x-text="t('g50')"></label>
-                                <input type="number" x-model="cart[product.id].g50" @input="limitInput($event); saveLocal()" placeholder="0"
-                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 text-center font-bold text-gray-900 text-lg focus:border-blue-500 focus:bg-white outline-none transition-colors tabular-nums">
+                                <input type="text" inputmode="numeric" 
+                                    :value="formatDisplayInput(cart[product.id].g50)" 
+                                    @input="handleInput($event, product.id, 'g50')"
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 text-center font-bold text-gray-900 text-lg focus:border-gold-500 focus:bg-white outline-none transition-colors tabular-nums">
                             </div>
                             <div class="space-y-1">
                                 <label class="block text-[10px] font-bold text-gray-400 text-center uppercase" x-text="t('g250')"></label>
-                                <input type="number" x-model="cart[product.id].g250" @input="limitInput($event); saveLocal()" placeholder="0"
-                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 text-center font-bold text-gray-900 text-lg focus:border-blue-500 focus:bg-white outline-none transition-colors tabular-nums">
+                                <input type="text" inputmode="numeric"
+                                    :value="formatDisplayInput(cart[product.id].g250)" 
+                                    @input="handleInput($event, product.id, 'g250')"
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 text-center font-bold text-gray-900 text-lg focus:border-gold-500 focus:bg-white outline-none transition-colors tabular-nums">
                             </div>
                             <div class="space-y-1">
                                 <label class="block text-[10px] font-bold text-gray-400 text-center uppercase" x-text="t('g1000')"></label>
-                                <input type="number" x-model="cart[product.id].g1000" @input="limitInput($event); saveLocal()" placeholder="0"
-                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 text-center font-bold text-gray-900 text-lg focus:border-blue-500 focus:bg-white outline-none transition-colors tabular-nums">
+                                <input type="text" inputmode="numeric"
+                                    :value="formatDisplayInput(cart[product.id].g1000)" 
+                                    @input="handleInput($event, product.id, 'g1000')"
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 text-center font-bold text-gray-900 text-lg focus:border-gold-500 focus:bg-white outline-none transition-colors tabular-nums">
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-3 bg-gray-50 h-10 px-4 border-t border-gray-100 flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider" x-text="t('productTotal')"></span>
-                        
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center justify-end gap-1.5 w-20">
-                                <i class="fa-solid fa-box text-gray-400 text-xs"></i>
-                                <span class="font-bold text-gray-800 text-sm tabular-nums" x-text="formatNum(getRowKoli(product.id))"></span>
-                            </div>
-                            <div class="flex items-center justify-end gap-1.5 w-24">
-                                <i class="fa-solid fa-weight-hanging text-blue-400 text-xs"></i>
-                                <span class="font-bold text-blue-600 text-sm tabular-nums" x-text="formatNum(getRowKg(product.id)) + ' kg'"></span>
-                            </div>
+                    <div class="mt-3 bg-gray-50 h-10 px-4 border-t border-gray-100 flex items-center justify-center gap-6">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">KOLİ</span>
+                            <span class="font-bold text-gray-800 text-sm tabular-nums" x-text="formatNum(getRowKoli(product.id))"></span>
+                        </div>
+                        <div class="w-px h-4 bg-gray-300"></div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">KG</span>
+                            <span class="font-bold text-gold-600 text-sm tabular-nums" x-text="formatNum(getRowKg(product.id))"></span>
                         </div>
                     </div>
                 </div>
@@ -145,25 +167,25 @@
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50 safe-bottom">
+    <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50 pb-safe">
         <div class="max-w-3xl mx-auto">
-            <div class="grid grid-cols-3 divide-x divide-gray-100 bg-gray-50/80 backdrop-blur" :class="lang === 'ar' ? 'divide-x-reverse' : ''">
+            <div class="grid grid-cols-3 divide-x divide-gray-100 bg-gold-50/50" :class="lang === 'ar' ? 'divide-x-reverse' : ''">
                 <div class="p-2.5 text-center">
                     <p class="text-[10px] font-bold text-gray-400 uppercase" x-text="t('totalBox')"></p>
                     <p class="text-lg font-black text-gray-800 tabular-nums" x-text="formatNum(grandTotalKoli)"></p>
                 </div>
                 <div class="p-2.5 text-center">
                     <p class="text-[10px] font-bold text-gray-400 uppercase" x-text="t('totalKg')"></p>
-                    <p class="text-lg font-black text-blue-600 tabular-nums" x-text="formatNum(grandTotalKg)"></p>
+                    <p class="text-lg font-black text-gold-600 tabular-nums" x-text="formatNum(grandTotalKg)"></p>
                 </div>
                 <div class="p-2.5 text-center">
                     <p class="text-[10px] font-bold text-gray-400 uppercase" x-text="t('items')"></p>
-                    <p class="text-lg font-black text-gray-800 tabular-nums" x-text="totalItemsCount"></p>
+                    <p class="text-lg font-black text-gray-800 tabular-nums" x-text="formatNum(totalItemsCount)"></p>
                 </div>
             </div>
             
-            <div class="p-3">
-                <button @click="openSummaryModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-base shadow-lg shadow-blue-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            <div class="p-3 pb-5">
+                <button @click="openSummaryModal()" class="w-full bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white py-4 rounded-xl font-bold text-base shadow-lg shadow-gold-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                     <i class="fa-solid fa-check-circle"></i>
                     <span x-text="t('viewSummary')"></span>
                 </button>
@@ -174,66 +196,60 @@
     <div x-show="showModal" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4" x-cloak>
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" @click="showModal=false"></div>
         
-        <div class="relative bg-white w-full sm:max-w-2xl h-[90vh] sm:h-auto sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col overflow-hidden">
+        <div class="relative bg-white w-full sm:max-w-3xl h-[90vh] sm:h-auto sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col overflow-hidden">
             
-            <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <div>
-                    <h2 class="font-bold text-lg text-gray-800" x-text="t('orderSummary')"></h2>
-                    <p class="text-xs text-gray-500 mt-0.5" x-text="currentUser + ' #' + orderCode"></p>
+            <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <div class="flex items-center gap-3">
+                    <img src="images/adalyalogo.jpg" class="h-8 object-contain" onerror="this.style.display='none'">
+                    <div class="h-8 w-px bg-gray-300"></div>
+                    <div>
+                        <h2 class="font-bold text-base text-gray-800 uppercase tracking-wide" x-text="t('orderSummary')"></h2>
+                        <p class="text-[10px] text-gray-500" x-text="orderCode"></p>
+                    </div>
                 </div>
                 <button @click="showModal=false" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <div class="flex-1 overflow-y-auto custom-scroll bg-white p-0">
-                <table class="w-full text-sm text-left">
-                    <thead class="bg-gray-100 text-gray-600 sticky top-0 shadow-sm">
+            <div class="flex-1 overflow-y-auto custom-scroll bg-white p-4">
+                <table class="w-full text-sm text-left border-collapse summary-table">
+                    <thead class="bg-gold-50 text-gold-900 sticky top-0 shadow-sm">
                         <tr>
-                            <th class="px-4 py-3 text-xs font-bold uppercase" x-text="t('product')"></th>
-                            <th class="px-2 py-3 text-center text-xs font-bold text-gray-400" x-text="t('g50')"></th>
-                            <th class="px-2 py-3 text-center text-xs font-bold text-gray-400" x-text="t('g250')"></th>
-                            <th class="px-2 py-3 text-center text-xs font-bold text-gray-400" x-text="t('g1000')"></th>
-                            <th class="px-4 py-3 text-right text-xs font-bold uppercase" x-text="t('total')"></th>
+                            <th class="px-2 py-2 text-xs font-bold uppercase w-1/3" x-text="t('product')"></th>
+                            <th class="px-1 py-2 text-center text-[10px] font-bold" x-text="t('g50')"></th>
+                            <th class="px-1 py-2 text-center text-[10px] font-bold" x-text="t('g250')"></th>
+                            <th class="px-1 py-2 text-center text-[10px] font-bold" x-text="t('g1000')"></th>
+                            <th class="px-1 py-2 text-center text-[10px] font-bold bg-gray-50">KOLİ</th>
+                            <th class="px-1 py-2 text-center text-[10px] font-bold bg-gray-50">KG</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody>
                         <template x-for="p in products" :key="p.id">
-                            <tr x-show="getRowKoli(p.id) > 0" class="hover:bg-blue-50/50">
-                                <td class="px-4 py-3 font-semibold text-gray-800 max-w-[120px] break-words" x-text="getProductName(p)"></td>
-                                <td class="px-2 py-3 text-center">
-                                    <span x-show="getVal(cart[p.id].g50)>0" x-text="formatNum(cart[p.id].g50)" class="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-bold tabular-nums"></span>
-                                    <span x-show="!getVal(cart[p.id].g50)" class="text-gray-200 text-xs">-</span>
-                                </td>
-                                <td class="px-2 py-3 text-center">
-                                    <span x-show="getVal(cart[p.id].g250)>0" x-text="formatNum(cart[p.id].g250)" class="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-bold tabular-nums"></span>
-                                    <span x-show="!getVal(cart[p.id].g250)" class="text-gray-200 text-xs">-</span>
-                                </td>
-                                <td class="px-2 py-3 text-center">
-                                    <span x-show="getVal(cart[p.id].g1000)>0" x-text="formatNum(cart[p.id].g1000)" class="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-bold tabular-nums"></span>
-                                    <span x-show="!getVal(cart[p.id].g1000)" class="text-gray-200 text-xs">-</span>
-                                </td>
-                                <td class="px-4 py-3 text-right">
-                                    <div class="font-bold text-gray-800 tabular-nums" x-text="formatNum(getRowKoli(p.id))"></div>
-                                    <div class="text-[10px] text-blue-500 font-medium tabular-nums" x-text="formatNum(getRowKg(p.id)) + ' kg'"></div>
-                                </td>
+                            <tr x-show="getRowKoli(p.id) > 0" class="hover:bg-gray-50">
+                                <td class="px-2 py-2 font-semibold text-gray-800 text-xs" x-text="getProductName(p)"></td>
+                                <td class="px-1 py-2 text-center tabular-nums text-xs" x-text="formatNum(getVal(cart[p.id].g50)) || '-'"></td>
+                                <td class="px-1 py-2 text-center tabular-nums text-xs" x-text="formatNum(getVal(cart[p.id].g250)) || '-'"></td>
+                                <td class="px-1 py-2 text-center tabular-nums text-xs" x-text="formatNum(getVal(cart[p.id].g1000)) || '-'"></td>
+                                <td class="px-1 py-2 text-center font-bold bg-gray-50/50 tabular-nums" x-text="formatNum(getRowKoli(p.id))"></td>
+                                <td class="px-1 py-2 text-center font-bold text-gold-600 bg-gray-50/50 tabular-nums" x-text="formatNum(getRowKg(p.id))"></td>
                             </tr>
                         </template>
                     </tbody>
-                    <tfoot class="bg-blue-50 border-t border-blue-100">
+                    <tfoot class="bg-gray-100 font-bold text-xs border-t-2 border-gold-400">
                         <tr>
-                            <td class="px-4 py-3 font-bold text-blue-900" x-text="t('grandTotal')"></td>
-                            <td colspan="3"></td>
-                            <td class="px-4 py-3 text-right">
-                                <div class="text-lg font-black text-blue-700 tabular-nums" x-text="formatNum(grandTotalKoli)"></div>
-                                <div class="text-xs font-bold text-blue-500 tabular-nums" x-text="formatNum(grandTotalKg) + ' kg'"></div>
-                            </td>
+                            <td class="px-2 py-2 text-gray-600" x-text="t('total')"></td>
+                            <td class="px-1 py-2 text-center tabular-nums" x-text="formatNum(columnSums.g50)"></td>
+                            <td class="px-1 py-2 text-center tabular-nums" x-text="formatNum(columnSums.g250)"></td>
+                            <td class="px-1 py-2 text-center tabular-nums" x-text="formatNum(columnSums.g1000)"></td>
+                            <td class="px-1 py-2 text-center bg-gray-200 tabular-nums" x-text="formatNum(grandTotalKoli)"></td>
+                            <td class="px-1 py-2 text-center bg-gray-200 text-gold-700 tabular-nums" x-text="formatNum(grandTotalKg)"></td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
 
-            <div class="p-4 border-t border-gray-100 bg-white pb-8 sm:pb-4">
+            <div class="p-4 border-t border-gray-100 bg-white pb-8 sm:pb-4 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
                 <div class="grid grid-cols-2 gap-3 mb-3">
                     <button @click="exportPDF()" class="bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -261,72 +277,35 @@
                 orderCode: '',
                 deliveryMethod: 'road',
                 showModal: false,
+                showScrollBtn: false,
 
-                // ÇEVİRİLER
                 translations: {
                     tr: { 
-                        subtitle: 'Sipariş Sistemi',
-                        noteLabel: 'Sipariş Notu',
-                        notePlaceholder: 'Örn: Acil teslimat...',
-                        deliveryLabel: 'Teslimat Şekli',
-                        road: 'Karayolu', sea: 'Denizyolu', air: 'Havayolu',
-                        search: 'Ürün ara...',
-                        noProduct: 'Ürün bulunamadı.',
-                        productTotal: 'Ürün Toplamı',
-                        totalBox: 'Toplam Koli',
-                        totalKg: 'Toplam KG',
-                        items: 'Çeşit',
-                        viewSummary: 'Siparişi Tamamla',
-                        orderSummary: 'Sipariş Özeti',
-                        product: 'Ürün',
-                        total: 'Toplam',
-                        grandTotal: 'GENEL TOPLAM',
-                        sendWhatsapp: 'WhatsApp ile Gönder',
-                        g50: '50 GR', g250: '250 GR', g1000: '1 KG'
+                        noteLabel: 'Sipariş Notu', notePlaceholder: 'Notunuzu buraya yazın...', deliveryLabel: 'Teslimat Şekli',
+                        road: 'Karayolu', sea: 'Denizyolu', air: 'Havayolu', search: 'Ürün ara...', noProduct: 'Ürün bulunamadı.',
+                        totalBox: 'Toplam Koli', totalKg: 'Toplam KG', items: 'Çeşit', viewSummary: 'Siparişi Onayla',
+                        orderSummary: 'Sipariş Detayı', product: 'Ürün', total: 'TOPLAM', grandTotal: 'GENEL TOPLAM',
+                        sendWhatsapp: 'WhatsApp Sipariş', g50: '50 GR', g250: '250 GR', g1000: '1 KG'
                     },
                     en: { 
-                        subtitle: 'Order System',
-                        noteLabel: 'Order Note',
-                        notePlaceholder: 'Ex: Urgent delivery...',
-                        deliveryLabel: 'Delivery Method',
-                        road: 'Road', sea: 'Sea', air: 'Air',
-                        search: 'Search product...',
-                        noProduct: 'No product found.',
-                        productTotal: 'Product Total',
-                        totalBox: 'Total Box',
-                        totalKg: 'Total KG',
-                        items: 'Items',
-                        viewSummary: 'Complete Order',
-                        orderSummary: 'Order Summary',
-                        product: 'Product',
-                        total: 'Total',
-                        grandTotal: 'GRAND TOTAL',
-                        sendWhatsapp: 'Send via WhatsApp',
-                        g50: '50 GR', g250: '250 GR', g1000: '1 KG'
+                        noteLabel: 'Order Note', notePlaceholder: 'Type your note...', deliveryLabel: 'Delivery Method',
+                        road: 'Road', sea: 'Sea', air: 'Air', search: 'Search product...', noProduct: 'No product found.',
+                        totalBox: 'Total Box', totalKg: 'Total KG', items: 'Items', viewSummary: 'Confirm Order',
+                        orderSummary: 'Order Detail', product: 'Product', total: 'TOTAL', grandTotal: 'GRAND TOTAL',
+                        sendWhatsapp: 'Order via WhatsApp', g50: '50 GR', g250: '250 GR', g1000: '1 KG'
                     },
                     ar: { 
-                        subtitle: 'نظام الطلب',
-                        noteLabel: 'ملاحظة الطلب',
-                        notePlaceholder: 'مثال: توصيل عاجل...',
-                        deliveryLabel: 'طريقة التسليم',
-                        road: 'براً', sea: 'بحراً', air: 'جواً',
-                        search: 'بحث عن منتج...',
-                        noProduct: 'لم يتم العثور على منتج.',
-                        productTotal: 'مجموع المنتج',
-                        totalBox: 'مجموع الصناديق',
-                        totalKg: 'مجموع الوزن',
-                        items: 'الأصناف',
-                        viewSummary: 'إتمام الطلب',
-                        orderSummary: 'ملخص الطلب',
-                        product: 'المنتج',
-                        total: 'المجموع',
-                        grandTotal: 'الإجمالي الكلي',
-                        sendWhatsapp: 'إرسال عبر واتساب',
-                        g50: '٥٠ غرام', g250: '٢٥٠ غرام', g1000: '١ كجم'
+                        noteLabel: 'ملاحظة الطلب', notePlaceholder: 'اكتب ملاحظتك هنا...', deliveryLabel: 'طريقة التسليم',
+                        road: 'براً', sea: 'بحراً', air: 'جواً', search: 'بحث عن منتج...', noProduct: 'لم يتم العثور على منتج.',
+                        totalBox: 'مجموع الصناديق', totalKg: 'مجموع الوزن', items: 'الأصناف', viewSummary: 'تأكيد الطلب',
+                        orderSummary: 'تفاصيل الطلب', product: 'المنتج', total: 'المجموع', grandTotal: 'الإجمالي الكلي',
+                        sendWhatsapp: 'طلب عبر واتساب', g50: '٥٠ غرام', g250: '٢٥٠ غرام', g1000: '١ كجم'
                     }
                 },
 
                 t(key) { return this.translations[this.lang][key] || key; },
+                
+                changeLang(l) { this.lang = l; },
 
                 getDeliveryIconClass(method) {
                     const icons = { road: 'fa-truck', sea: 'fa-ship', air: 'fa-plane' };
@@ -335,39 +314,89 @@
 
                 async init() {
                     this.currentUser = sessionStorage.getItem('user') || 'USER';
-                    // Rastgele Kod
                     const today = new Date();
                     const rnd = Math.floor(1000 + Math.random() * 9000);
                     this.orderCode = `${today.getDate()}${today.getMonth()+1}-${rnd}`;
+
+                    // Scroll takibi
+                    window.addEventListener('scroll', () => {
+                        this.showScrollBtn = window.scrollY > 200;
+                    });
 
                     try {
                         const res = await fetch('products.json?v=' + Date.now());
                         const data = await res.json();
                         this.products = data.products;
-                        const savedCart = localStorage.getItem('adalya_cart_v3');
+                        const savedCart = localStorage.getItem('adalya_cart_v4');
                         if(savedCart) this.cart = JSON.parse(savedCart);
                         else this.products.forEach(p => this.cart[p.id] = { g50: '', g250: '', g1000: '' });
                     } catch(e) { console.error(e); }
                 },
 
                 saveLocal() {
-                    localStorage.setItem('adalya_cart_v3', JSON.stringify(this.cart));
+                    localStorage.setItem('adalya_cart_v4', JSON.stringify(this.cart));
                 },
 
-                // 1. Özellik: Max 5 Giriş Kontrolü
-                limitInput(e) {
-                    if(e.target.value.length > 5) e.target.value = e.target.value.slice(0,5);
+                // --- MANTIK: GİRİŞ VE FORMATLAMA ---
+
+                // 1. Input'a yazılanı işleyen ana fonksiyon
+                handleInput(e, productId, gramType) {
+                    let val = e.target.value;
+                    
+                    // Sadece rakamları al (Arapça rakamlar girilirse onları da Latin'e çevir)
+                    val = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)); // Doğu->Batı
+                    val = val.replace(/[^0-9]/g, ''); // Rakam dışı her şeyi sil
+
+                    // 6 hane sınırı
+                    if (val.length > 6) val = val.slice(0, 6);
+
+                    // Veriyi model'e kaydet (Sayı olarak tutuyoruz, string değil)
+                    this.cart[productId][gramType] = val;
+                    this.saveLocal();
+
+                    // Input'un görünen değerini formatla (Anlık 1.000 formatı)
+                    e.target.value = this.formatDisplayInput(val);
                 },
 
-                // 2. Özellik: Binlik Ayıraç Formatlama
-                formatNum(num) {
-                    if(!num) return '0';
-                    return parseInt(num).toLocaleString('tr-TR');
+                // 2. Input içinde göstereceğimiz değeri formatlayan fonksiyon
+                formatDisplayInput(val) {
+                    if (!val) return '';
+                    // Önce Latin rakamına çevirip formatlayalım
+                    let numStr = val.toString();
+                    // Binlik ayıraç ekle (TR stili nokta)
+                    let formatted = numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    
+                    // Eğer dil Arapça ise, formatlanmış halini Arapça rakamlarına çevir
+                    if (this.lang === 'ar') {
+                        return formatted.replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+                    }
+                    return formatted;
                 },
 
-                getVal(val) { return val === '' ? 0 : parseInt(val); },
-                getRowKoli(id) { const i = this.cart[id]; return i ? this.getVal(i.g50) + this.getVal(i.g250) + this.getVal(i.g1000) : 0; },
+                // 3. Metin içinde (input dışı) sayıları gösteren fonksiyon
+                formatNum(val) {
+                    if (!val && val !== 0) return '0';
+                    let num = parseInt(val);
+                    let formatted = num.toLocaleString('tr-TR'); // 1.000 formatı
+                    
+                    if (this.lang === 'ar') {
+                        return formatted.replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+                    }
+                    return formatted;
+                },
+
+                getVal(val) { 
+                    if (!val) return 0;
+                    // Veritabanında/Cart'ta latin rakamı olarak tutuyoruz, direkt parse et
+                    return parseInt(val.toString().replace(/[^0-9]/g, ''));
+                },
+
+                getRowKoli(id) { 
+                    const i = this.cart[id]; 
+                    return i ? this.getVal(i.g50) + this.getVal(i.g250) + this.getVal(i.g1000) : 0; 
+                },
                 getRowKg(id) { return this.getRowKoli(id) * 6; },
+                
                 getProductName(p) { return this.lang === 'tr' ? p.tr : (this.lang === 'ar' ? p.ar : p.en); },
 
                 get filteredProducts() {
@@ -384,6 +413,19 @@
                 get grandTotalKg() { return this.grandTotalKoli * 6; },
                 get totalItemsCount() { return Object.keys(this.cart).filter(id => this.getRowKoli(id) > 0).length; },
 
+                // Sütun toplamları (Tablo Footer için)
+                get columnSums() {
+                    let sums = { g50: 0, g250: 0, g1000: 0 };
+                    Object.keys(this.cart).forEach(id => {
+                        if(this.getRowKoli(id) > 0) {
+                            sums.g50 += this.getVal(this.cart[id].g50);
+                            sums.g250 += this.getVal(this.cart[id].g250);
+                            sums.g1000 += this.getVal(this.cart[id].g1000);
+                        }
+                    });
+                    return sums;
+                },
+
                 openSummaryModal() {
                     if(this.grandTotalKoli === 0) {
                         alert(this.lang === 'tr' ? 'Sepet boş!' : 'Cart empty!');
@@ -393,13 +435,18 @@
                 },
 
                 // ÇIKTILAR
+                trToEng(str) {
+                    if(!str) return "";
+                    const map = {'ğ':'g','Ğ':'G','ü':'u','Ü':'U','ş':'s','Ş':'S','ı':'i','İ':'I','ö':'o','Ö':'O','ç':'c','Ç':'C'};
+                    return str.replace(/[ğĞüÜşŞıİöÖçÇ]/g, function(match) { return map[match]; });
+                },
 
                 exportExcel() {
                     let data = [
                         ["Sipariş Detayı"],
                         ["Tarih", new Date().toLocaleDateString(), "Kod", this.orderCode],
                         ["Kullanıcı", this.currentUser, "Teslimat", this.t(this.deliveryMethod)],
-                        ["Not", this.orderNote], // 7. Özellik: Not eklendi
+                        ["Not", this.orderNote],
                         [],
                         ["Ürün Adı", "50g", "250g", "1Kg", "Toplam Koli", "KG"]
                     ];
@@ -417,19 +464,12 @@
                             ]);
                         }
                     });
-                    data.push(["GENEL TOPLAM", "", "", "", this.formatNum(this.grandTotalKoli), this.formatNum(this.grandTotalKg)]);
+                    data.push(["GENEL TOPLAM", this.formatNum(this.columnSums.g50), this.formatNum(this.columnSums.g250), this.formatNum(this.columnSums.g1000), this.formatNum(this.grandTotalKoli), this.formatNum(this.grandTotalKg)]);
 
                     const ws = XLSX.utils.aoa_to_sheet(data);
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, "Siparis");
-                    XLSX.writeFile(wb, `Adalya_${this.orderCode}.xlsx`);
-                },
-
-                // 4. Özellik: PDF Türkçe Karakter Düzeltmesi (Harita Yöntemi)
-                trToEng(str) {
-                    if(!str) return "";
-                    const map = {'ğ':'g','Ğ':'G','ü':'u','Ü':'U','ş':'s','Ş':'S','ı':'i','İ':'I','ö':'o','Ö':'O','ç':'c','Ç':'C'};
-                    return str.replace(/[ğĞüÜşŞıİöÖçÇ]/g, function(match) { return map[match]; });
+                    XLSX.writeFile(wb, `Siparis_${this.orderCode}.xlsx`);
                 },
 
                 exportPDF() {
@@ -442,13 +482,12 @@
                     doc.text(`Kullanici: ${this.trToEng(this.currentUser)}`, 14, 22);
                     doc.text(`Tarih: ${new Date().toLocaleDateString()}`, 14, 27);
                     doc.text(`Teslimat: ${this.trToEng(this.t(this.deliveryMethod))}`, 14, 32);
-                    if(this.orderNote) doc.text(`Not: ${this.trToEng(this.orderNote)}`, 14, 37); // 7. Özellik
+                    if(this.orderNote) doc.text(`Not: ${this.trToEng(this.orderNote)}`, 14, 37);
 
                     let body = [];
                     this.products.forEach(p => {
                         if(this.getRowKoli(p.id) > 0) {
                             const i = this.cart[p.id];
-                            // Ürün ismini de İngilizce karakterlere çeviriyoruz ki patlamasın
                             body.push([
                                 this.trToEng(p.tr),
                                 this.formatNum(this.getVal(i.g50)),
@@ -465,18 +504,22 @@
                         body: body,
                         startY: 45,
                         theme: 'grid',
-                        foot: [['TOPLAM', '', '', '', this.formatNum(this.grandTotalKoli), this.formatNum(this.grandTotalKg)]]
+                        foot: [['TOPLAM', 
+                                this.formatNum(this.columnSums.g50), 
+                                this.formatNum(this.columnSums.g250), 
+                                this.formatNum(this.columnSums.g1000), 
+                                this.formatNum(this.grandTotalKoli), 
+                                this.formatNum(this.grandTotalKg)]]
                     });
 
-                    doc.save(`Adalya_${this.orderCode}.pdf`);
+                    doc.save(`Siparis_${this.orderCode}.pdf`);
                 },
 
-                // 5. Özellik: WhatsApp İyileştirmesi
                 shareWhatsapp() {
-                    let text = `*SİPARİŞ - ${this.orderCode}*\n`;
-                    text += `👤 ${this.currentUser}\n`;
-                    text += `🚛 ${this.t(this.deliveryMethod)}\n`;
-                    if(this.orderNote) text += `📝 ${this.orderNote}\n`; // 7. Özellik
+                    let text = `*ADALYA - SİPARİŞ DETAYI*\n`;
+                    text += `👤 *${this.currentUser}* (#${this.orderCode})\n`;
+                    text += `🚛 Teslimat: ${this.t(this.deliveryMethod)}\n`;
+                    if(this.orderNote) text += `📝 Not: ${this.orderNote}\n`;
                     text += `------------------\n`;
 
                     this.products.forEach(p => {
@@ -485,17 +528,20 @@
                         if(koli > 0) {
                             const i = this.cart[p.id];
                             text += `\n🔹 *${this.getProductName(p)}*`;
-                            // Ürün yanına Koli/KG ekledik
-                            text += ` (${this.formatNum(koli)} Koli / ${this.formatNum(kg)} Kg)\n`; 
+                            text += `\n   📦 *${this.formatNum(koli)} Koli* / ⚖️ *${this.formatNum(kg)} Kg*`;
                             
-                            if(this.getVal(i.g50)) text += `   ▫️ 50g: ${this.formatNum(i.g50)}\n`;
-                            if(this.getVal(i.g250)) text += `   ▫️ 250g: ${this.formatNum(i.g250)}\n`;
-                            if(this.getVal(i.g1000)) text += `   ▫️ 1kg: ${this.formatNum(i.g1000)}\n`;
+                            // Eski liste formatına döndük ama daha temiz
+                            if(this.getVal(i.g50)) text += `\n   ▫️ 50g: ${this.formatNum(i.g50)}`;
+                            if(this.getVal(i.g250)) text += `\n   ▫️ 250g: ${this.formatNum(i.g250)}`;
+                            if(this.getVal(i.g1000)) text += `\n   ▫️ 1kg: ${this.formatNum(i.g1000)}`;
+                            text += `\n`;
                         }
                     });
 
-                    text += `\n------------------\n`;
-                    text += `📊 *TOPLAM: ${this.formatNum(this.grandTotalKoli)} Koli / ${this.formatNum(this.grandTotalKg)} Kg*`;
+                    text += `------------------\n`;
+                    text += `📊 *GENEL TOPLAM:*\n`;
+                    text += `📦 Koli: ${this.formatNum(this.grandTotalKoli)}\n`;
+                    text += `⚖️ Ağırlık: ${this.formatNum(this.grandTotalKg)} Kg`;
 
                     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
                 }
