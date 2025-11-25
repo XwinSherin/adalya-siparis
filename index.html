@@ -3,99 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Adalya - Giriş</title>
+    <title>Adalya Platinum</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="images/icon-192.png" type="image/png">
+    <meta name="theme-color" content="#d4af37">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        body { font-family: 'Inter', sans-serif; background: #ffffff; }
+        .gold-btn { background: linear-gradient(45deg, #d4af37, #e6c944); }
+        .gold-btn:hover { background: linear-gradient(45deg, #c19a2b, #d4af37); }
     </style>
 </head>
-<body class="h-screen w-screen flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1520032525096-7bd04a94b561?q=80&w=1000&auto=format')] bg-cover bg-center">
-    
-    <div class="absolute inset-0 bg-black/40"></div>
+<body class="min-h-screen flex items-center justify-center px-4 bg-white relative">
 
-    <div x-data="loginApp()" class="relative z-10 w-full max-w-md p-6">
-        <div class="glass rounded-3xl shadow-2xl p-8 border border-white/20">
-            
-            <div class="flex justify-center mb-8">
-                <div class="w-24 h-24 rounded-full bg-white p-1 shadow-lg overflow-hidden">
-                    <img src="images/adalyalogo.jpg" onerror="this.src='https://via.placeholder.com/150?text=Adalya'" class="w-full h-full object-cover rounded-full">
-                </div>
-            </div>
+    <!-- DİL TUŞLARI SAĞ ÜSTTE -->
+    <div class="fixed top-4 right-4 z-50 flex gap-2 bg-white rounded-lg shadow-lg p-2 border">
+        <button @click="setLang('tr')" :class="lang==='tr' ? 'bg-gold-500 text-white' : 'bg-gray-100 text-gray-700'"
+                class="w-10 h-9 rounded font-bold text-sm hover:scale-110 transition">TR</button>
+        <button @click="setLang('ar')" :class="lang==='ar' ? 'bg-gold-500 text-white' : 'bg-gray-100 text-gray-700'"
+                class="w-10 h-9 rounded font-bold text-sm hover:scale-110 transition">العربية</button>
+        <button @click="setLang('en')" :class="lang==='en' ? 'bg-gold-500 text-white' : 'bg-gray-100 text-gray-700'"
+                class="w-10 h-9 rounded font-bold text-sm hover:scale-110 transition">EN</button>
+    </div>
 
-            <div class="text-center mb-8">
-                <h1 class="text-2xl font-extrabold text-gray-800">Adalya Company</h1>
-                <p class="text-gray-500 text-sm mt-1">Bayi Sipariş Sistemi</p>
-            </div>
+    <div x-data="loginApp()" class="w-full max-w-md">
+        <div class="flex justify-center mb-10">
+            <img src="images/adalyalogo.jpg" alt="Adalya" class="w-32 h-32 object-cover rounded-2xl shadow-2xl border-4 border-gold-500">
+        </div>
 
-            <div class="space-y-4">
-                <div>
-                    <input type="text" x-model="username" placeholder="Kullanıcı Adı" 
-                        class="w-full px-5 py-4 rounded-xl bg-gray-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 transition-all font-semibold text-gray-700"
-                        @keydown.enter="$refs.passInput.focus()">
-                </div>
-                
-                <div>
-                    <input x-ref="passInput" type="password" x-model="password" placeholder="Şifre" 
-                        class="w-full px-5 py-4 rounded-xl bg-gray-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 transition-all font-semibold text-gray-700"
-                        @keydown.enter="login()">
-                </div>
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">ADALYA</h1>
+
+            <div class="space-y-5">
+                <input type="text" x-model="username" :placeholder="t('username')"
+                       class="w-full px-5 py-4 rounded-xl border border-gray-300 focus:border-gold-500 focus:ring-4 focus:ring-gold-100 outline-none text-lg"
+                       @keydown.enter="$refs.pass.focus()">
+
+                <input x-ref="pass" type="password" x-model="password" :placeholder="t('password')"
+                       class="w-full px-5 py-4 rounded-xl border border-gray-300 focus:border-gold-500 focus:ring-4 focus:ring-gold-100 outline-none text-lg"
+                       @keydown.enter="login()">
 
                 <button @click="login()" 
-                    class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all active:scale-95 flex justify-center items-center">
-                    <span x-show="!loading">Giriş Yap</span>
-                    <span x-show="loading" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                        class="w-full py-5 gold-btn text-black font-bold text-xl rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200">
+                    <span x-show="!loading" x-text="t('login')"></span>
+                    <span x-show="loading" class="animate-spin h-6 w-6 border-4 border-black border-t-transparent rounded-full ml-3"></span>
                 </button>
 
-                <p x-show="error" x-transition class="text-red-500 text-center text-sm font-bold mt-2" x-text="errorMsg"></p>
+                <p x-show="error" x-transition class="text-red-600 text-center font-medium" x-text="t('error')"></p>
             </div>
-        </div>
-        
-        <div class="mt-6 flex justify-center gap-4">
-            <button class="text-white/80 font-semibold text-sm hover:text-white">Türkçe</button>
-            <span class="text-white/40">|</span>
-            <button class="text-white/80 font-semibold text-sm hover:text-white">العربية</button>
+
+            <!-- ADMIN PANELİ GİRİŞİ -->
+            <div x-show="currentUser && currentRole === 'admin'" class="mt-8 pt-6 border-t">
+                <button @click="window.location.href='admin.html'" 
+                        class="w-full py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition">
+                    ⚙️ YÖNETİCİ PANELİ
+                </button>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
     <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        const translations = {
+            tr: { username: "Kullanıcı Adı", password: "Şifre", login: "GİRİŞ YAP", error: "Hatalı giriş!" },
+            ar: { username: "اسم المستخدم", password: "كلمة المرور", login: "تسجيل الدخول", error: "بيانات خاطئة!" },
+            en: { username: "Username", password: "Password", login: "LOGIN", error: "Wrong credentials!" }
+        };
+
         function loginApp() {
             return {
-                username: '',
-                password: '',
-                loading: false,
-                error: false,
-                errorMsg: '',
+                username: '', password: '', loading: false, error: false,
+                lang: localStorage.getItem('adalya_lang') || 'tr',
+                currentUser: null, currentRole: null,
+
+                t(key) { return translations[this.lang][key]; },
+                setLang(l) { 
+                    this.lang = l; 
+                    localStorage.setItem('adalya_lang', l);
+                    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+                },
+
                 async login() {
-                    this.loading = true;
-                    this.error = false;
-                    
-                    // GitHub'dan kullanıcıları çekme simülasyonu (Gerçek URL'yi buraya koyacağız)
-                    // Güvenlik Notu: Bu basit bir ön yüz korumasıdır.
+                    this.loading = true; this.error = false;
                     try {
-                        const response = await fetch('users.json');
-                        const users = await response.json();
+                        const res = await fetch('users.json');
+                        const users = await res.json();
+                        const user = users.find(u => u.user.toLowerCase() === this.username.toLowerCase());
                         
-                        const user = users.find(u => u.user.toLowerCase() === this.username.toLowerCase() && u.pass === this.password);
-                        
-                        if(user) {
-                            sessionStorage.setItem('user', user.user);
-                            window.location.href = 'siparis.html';
+                        if (user && await bcrypt.compare(this.password, user.hash)) {
+                            localStorage.setItem('adalya_user', user.user);
+                            localStorage.setItem('adalya_role', user.role);
+                            this.currentUser = user.user;
+                            this.currentRole = user.role;
+                            setTimeout(() => window.location.href = 'siparis.html', 500);
                         } else {
-                            throw new Error('Hatalı kullanıcı adı veya şifre');
+                            this.error = true;
                         }
-                    } catch (e) {
-                        this.error = true;
-                        this.errorMsg = 'Giriş başarısız!';
-                        // Demo için fallback (Eğer json okuyamazsa test için)
-                        if(this.username === 'admin' && this.password === '1234') {
-                            window.location.href = 'siparis.html';
-                        }
-                    } finally {
-                        this.loading = false;
-                    }
+                    } catch { this.error = true; }
+                    this.loading = false;
                 }
             }
         }

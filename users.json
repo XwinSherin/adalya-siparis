@@ -1,7 +1,6 @@
 [
-  {"user": "omer", "pass": "1"},
-  {"user": "ahmet", "pass": "1234"},
-  {"user": "mehmet", "pass": "1234"}, 
-  {"user": "ayse", "pass": "1234"},
-  {"user": "test", "pass": "test"}
+  {"user": "omer", "hash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", "role": "user"},
+  {"user": "ahmet", "hash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", "role": "user"},
+  {"user": "mehmet", "hash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", "role": "user"},
+  {"user": "admin", "hash": "$2a$10$N9qo8uLOickgx2ZMRZoMye8P/0YdX8oW0mKZJ9q5.4d8v8v8v8v8v", "role": "admin"}
 ]
